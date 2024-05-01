@@ -1,0 +1,36 @@
+FONT: EQU 0x3C00
+
+putc:  ; a - character
+       ; d - y, e - x
+  push af
+  ld a, d
+  and 0x07
+  rrc a
+  rrc a
+  rrc a
+  add a, e
+  ld l, a
+  ld a, d
+  and 0x18
+  ld h, a
+  ld de, 0x4000
+  add hl, de
+  pop af
+  push hl
+
+  ld l, a
+  ld h, 0
+  add hl, hl
+  add hl, hl
+  add hl, hl
+  ld de, FONT
+  add hl, de
+  pop de
+  ld b, 8
+putc_loop:
+  ld a, (hl)
+  ld (de), a
+  inc hl
+  inc d
+  djnz putc_loop
+  ret

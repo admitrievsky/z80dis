@@ -1,0 +1,53 @@
+puts:  ; hl - string
+       ; d - y, e - x
+  push ix
+
+  push hl
+  pop ix
+
+  ld a, d
+  and 0x07
+  rrc a
+  rrc a
+  rrc a
+  add a, e
+  ld l, a
+  ld a, d
+  and 0x18
+  ld h, a
+  ld de, 0x4000
+  add hl, de
+
+puts_loop:
+  ld a, (ix)
+  or a
+  jr z, puts_exit
+  inc ix
+
+  push hl
+
+  push hl
+  ld l, a
+  ld h, 0
+  add hl, hl
+  add hl, hl
+  add hl, hl
+  ld de, FONT
+  add hl, de
+  pop de
+
+  ld b, 8
+puts_loop_char:
+  ld a, (hl)
+  ld (de), a
+  inc hl
+  inc d
+  djnz puts_loop_char
+
+  pop hl
+  inc l
+  jr puts_loop
+
+puts_exit:
+  pop ix
+  ret
