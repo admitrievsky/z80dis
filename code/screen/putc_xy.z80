@@ -1,10 +1,8 @@
-puts:  ; hl - string
-       ; d - y, e - x
-  push ix
+FONT: EQU 0x3C00
 
-  push hl
-  pop ix
-
+putc_xy:  ; a - character
+          ; d - y, e - x
+  push af
   ld a, d
   and 0x07
   rrc a
@@ -17,16 +15,9 @@ puts:  ; hl - string
   ld h, a
   ld de, 0x4000
   add hl, de
-
-puts_loop:
-  ld a, (ix)
-  or a
-  jr z, puts_exit
-  inc ix
-
+  pop af
   push hl
 
-  push hl
   ld l, a
   ld h, 0
   add hl, hl
@@ -35,19 +26,11 @@ puts_loop:
   ld de, FONT
   add hl, de
   pop de
-
   ld b, 8
-puts_loop_char:
+putc_xy_loop:
   ld a, (hl)
   ld (de), a
   inc hl
   inc d
-  djnz puts_loop_char
-
-  pop hl
-  inc l
-  jr puts_loop
-
-puts_exit:
-  pop ix
+  djnz putc_xy_loop
   ret

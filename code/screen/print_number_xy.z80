@@ -1,0 +1,45 @@
+print_number_xy:  ; hl - number to print
+                  ; d - y, e - x
+  ld a, 1  ; is leading char
+  ld bc, 10000
+  call print_number_xy_char
+  ld bc, 1000
+  call print_number_xy_char
+  ld bc, 100
+  call print_number_xy_char
+  ld bc, 10
+  call print_number_xy_char
+  ld a, l
+  add a, '0'
+  call putc_xy
+  ret
+
+print_number_xy_char:  ; bc - divider
+                       ; hl - number to print
+                       ; d - y, e - x
+  push af
+  xor a
+print_number_xy_char_loop:
+  sbc hl, bc
+  jr c, print_number_xy_char_next
+  inc a
+  jr print_number_xy_char_loop
+print_number_xy_char_next:
+  add hl, bc
+  pop bc
+  or a
+  jr nz, print_number_xy_char_next2
+  dec b ; is leading char?
+  jr c, print_number_xy_char_next2
+  ld a, 1
+  ret
+print_number_xy_char_next2:
+  add a, '0'
+  push hl
+  push de
+  call putc_xy
+  pop de
+  pop hl
+  inc e
+  ld a, 0
+  ret

@@ -1,29 +1,35 @@
 org 0x8000
 
 main:
-  ld d, 0
-  ld e, 1
+  ld de, 0x0304
+  call gotoxy
+
+  ld a, 33
 l1:
-  push de
-  ld a, d
-  add a, 33
+  push af
   call putc
-  pop de
-  inc d
-  inc e
-  ld a, d
-  cp 24
+  pop af
+  inc a
+  cp 70
   jr nz, l1
 
+  ld de, 0x0502
+  call gotoxy
+
   ld hl, HELLO
-  ld d, 3
-  ld e, 10
   call puts
+
+  ld hl, 12345
+  call print_number
+
+  ld hl, 54321
+  call print_number
 loop:  jp loop
 
-include "screen/putc.z80"
-include "screen/puts.z80"
-
+include "screen/putc_xy.z80"
+include "screen/puts_xy.z80"
+include "screen/print_number_xy.z80"
+include "screen/cursor.z80"
 
 HELLO: DEFB "HELLO WORLD", 0
 

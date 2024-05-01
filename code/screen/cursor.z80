@@ -1,0 +1,83 @@
+gotoxy:  ; d - y, e - x
+  ld hl, cursor_x
+  ld (hl), e
+  inc hl
+  ld (hl), d
+  ret
+
+
+putc:  ; a - char
+  call load_cursor
+  call putc_xy
+  call cursor_next
+  ret
+
+puts:  ; hl - string
+  ld a, (hl)
+  or a
+  ret z
+  push hl
+  call putc
+  pop hl
+  inc hl
+  jr puts
+
+print_number:  ; hl - number
+  ld e, 1  ; is leading char
+  ld bc, 10000
+  call print_number_char
+  ld bc, 1000
+  call print_number_char
+  ld bc, 100
+  call print_number_char
+  ld bc, 10
+  call print_number_char
+  ld a, l
+  add a, '0'
+  call putc
+  ret
+
+print_number_char:  ; bc - divider
+                    ; e - is leading char
+                    ; hl - number
+  xor a
+print_number_char_sub:
+  sbc hl, bc
+  jr c, print_number_char_next
+  inc a
+  jr print_number_char_sub
+print_number_char_next:
+  add hl, bc
+  or a
+  jr nz, print_number_char_next2
+  dec e
+  ld e, 1
+  ret z
+print_number_char_next2:
+  add a, '0'
+  push hl
+  call putc
+  pop hl
+  ld e, 0
+  ret
+
+load_cursor:
+  ld hl, cursor_x
+  ld e, (hl)
+  inc hl
+  ld d, (hl)
+  ret
+
+cursor_next:
+  ld hl, cursor_x
+  inc (hl)
+  ld a, (hl)
+  cp 32
+  ret nz
+  ld (hl), 0
+  inc hl
+  inc (hl)
+  ret
+
+cursor_x: DEFS 1, 0
+cursor_y: DEFS 1, 0
